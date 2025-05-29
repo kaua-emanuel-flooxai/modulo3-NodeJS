@@ -1,3 +1,10 @@
+const e = require("express");
+const NeDB = require("nedb");
+let db = new NeDB({
+  filename: "user.db",
+  autoload: true,
+});
+
 module.express = (app) => {
   app.get("/users", (req, res) => {
     res.statusCode = 200;
@@ -14,6 +21,15 @@ module.express = (app) => {
   });
 
   app.post("/users", (req, res) => {
-    res.json(req.body);
+    db.insert(req.body, (err, user) => {
+      if (err) {
+        console.log("error: ${err}");
+        res.status(400).json({
+          error: err,
+        });
+      } else {
+        res.status(200).json(user);
+      }
+    });
   });
 };
